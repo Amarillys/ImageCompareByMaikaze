@@ -11,6 +11,3 @@ D:\Source\ImageCompare\ImageCompare-Maikaze-\ImageCompare-Maikaze-\bin\Debug\Ima
 D:\Source\ImageCompare\ImageCompare-Maikaze-\ImageCompare-Maikaze-\obj\Debug\ImageCompare-Maikaze-.exe
 D:\Source\ImageCompare\ImageCompare-Maikaze-\ImageCompare-Maikaze-\obj\Debug\ImageCompare-Maikaze-.pdb
 D:\Source\ImageCompare\ImageCompare-Maikaze-\ImageCompare-Maikaze-\obj\Debug\ImageCompare-Maikaze-.csprojResolveAssemblyReference.cache
-D:\Source\git\ImageCompare-Maikaze-\ImageCompare-Maikaze-\bin\Debug\ImageCompare-Maikaze-.exe.config
-D:\Source\git\ImageCompare-Maikaze-\ImageCompare-Maikaze-\obj\Debug\ImageCompare-Maikaze-.exe
-D:\Source\git\ImageCompare-Maikaze-\ImageCompare-Maikaze-\obj\Debug\ImageCompare-Maikaze-.pdb

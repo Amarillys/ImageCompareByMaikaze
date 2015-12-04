@@ -14,8 +14,10 @@ namespace ImageCompare_Maikaze_
         /// <summary>
         /// Interface:
         /// 
-        /// ---> ChangeAlpha(int dst_alpha): to change the alpha of the image while its bitDepth is 32.
-        /// 
+        /// ---> ChangeAlpha(int dst_alpha) : to change the alpha of the image while its bitDepth is 32.
+        /// ---> EqualsTo(MaikazeImage img) :
+        /// ---> GetAlpha()                 :
+        /// ---> GetBitDepth()              :
         /// </summary>
         public int w,h;
         public int bitDepth;
@@ -36,7 +38,7 @@ namespace ImageCompare_Maikaze_
             w = dst_w;
             h = dst_h;
             bitDepth = bit;
-            px = new byte[w * h * bitDepth / 8 + 4];
+            px = new byte[w * h * bitDepth / 8];
             if(bit == 32)
             {
                 bmpSrc = BitmapSource.Create(w, h, 0, 0, PixelFormats.Pbgra32, null, px, bitDepth * w / 8);
@@ -66,7 +68,7 @@ namespace ImageCompare_Maikaze_
         public void GetBitDepth()
         {
             //get the bit depth of the image by reading its header
-            FileStream imgFile = new FileStream(fileName, FileMode.Open);
+            FileStream imgFile = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
             imgFile.Seek(0, SeekOrigin.Begin);
             if (imgFile.ReadByte() == 0x89)
                 if (imgFile.ReadByte() == 0x50)
@@ -82,6 +84,25 @@ namespace ImageCompare_Maikaze_
                     bitDepth = 24;
             }
             imgFile.Close();
+        }
+        public void MergeImage(MaikazeImage mergeBmp, int merge_x, int merge_y)
+        {
+            int ori_bpp = bitDepth / 8;
+            int ref_bpp = mergeBmp.bitDepth / 8;
+            int start_x = merge_x;
+            int start_y = merge_y;
+            if (merge_x < 0)    start_x = 0;
+            if (merge_y < 0)    start_y = 0;
+            for (int i = start_y; i < mergeBmp.h; i++)
+                for (int j = start_x; j < mergeBmp.w; j++)
+                {
+                    if (ref_bpp == 4 && mergeBmp.px[((i - start_y) * mergeBmp.w + j - start_x) * ref_bpp + 3] == 0)
+                        continue;
+                    px[(i * w + j) * ori_bpp + 0] = (byte)((mergeBmp.px[((i - start_y) * mergeBmp.w + j - start_x) * ref_bpp + 0] - px[(i * w + j) * ori_bpp + 0]) * mergeBmp.GetAlpha() / 255 + px[(i * h + j) * ori_bpp + 0]);
+                    px[(i * w + j) * ori_bpp + 1] = (byte)((mergeBmp.px[((i - start_y) * mergeBmp.w + j - start_x) * ref_bpp + 1] - px[(i * w + j) * ori_bpp + 1]) * mergeBmp.GetAlpha() / 255 + px[(i * h + j) * ori_bpp + 1]);
+                    px[(i * w + j) * ori_bpp + 2] = (byte)((mergeBmp.px[((i - start_y) * mergeBmp.w + j - start_x) * ref_bpp + 2] - px[(i * w + j) * ori_bpp + 2]) * mergeBmp.GetAlpha() / 255 + px[(i * h + j) * ori_bpp + 2]);
+                }
+            RefreshImageFromPixels();
         }
         public bool SuccessLoad()
         {
@@ -102,7 +123,11 @@ namespace ImageCompare_Maikaze_
         }
         public void RefreshImageFromPixels()
         {
-            bmpSrc = BitmapSource.Create(w, h, 0, 0, PixelFormats.Pbgra32, null, px, w * bitDepth / 8);
+            PixelFormat newFmt = PixelFormats.Bgra32;
+            if(bitDepth == 24)
+                newFmt = PixelFormats.Bgr24;
+            bmpSrc = BitmapSource.Create(w, h, 0, 0, newFmt, null, px, w * bitDepth / 8);
+            loadOkay = true;
         }
         public void Rgb_To_Rgba()
         {
@@ -110,7 +135,7 @@ namespace ImageCompare_Maikaze_
             Buffer.BlockCopy(px, 0, tmpPx, 0, px.Length);
             bitDepth = 32;
             px = new byte[w * h * bitDepth / 8];
-            for(int i = 0;i < px.Length / 4 - 1;i++)
+            for(int i = 0;i < px.Length / 4;i++)
             {
                 px[i * 4 + 0] = tmpPx[i * 3 + 0];
                 px[i * 4 + 1] = tmpPx[i * 3 + 1];
