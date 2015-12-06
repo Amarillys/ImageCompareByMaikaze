@@ -37,23 +37,30 @@ namespace ImageCompare_Maikaze_
         private bool[] WasLoaded,WasSaved;
         public MainWindow()
         {
-            InitValue();
+            StartNewObject();
             InitializeComponent();
             InitUI();
         }
         private void InitValue()
         {
-            dpBmp = new List<MaikazeImage>();
-            showText = new string[4];
-            dp_h = new int[4];
-            dp_w = new int[4];
             try_x = try_y = 0;
             try_unit = 1;
             cur_image = ImageOri;
-            WasLoaded = WasSaved = new bool[4];
             cleanPnt = 0;
             for(int i = 0;i < 4;i++)
                 WasLoaded[i] = WasSaved[i] = false;
+            foreach (string s in showText)
+                if (s != null)
+                    s.Remove(0, s.Length);
+        }
+        private void StartNewObject()
+        {
+            dpBmp = new List<MaikazeImage>();
+            showText = new string[4];
+            WasLoaded = WasSaved = new bool[4];
+            dp_h = new int[4];
+            dp_w = new int[4];
+            InitValue();
         }
         private void InitUI()
         {
@@ -267,8 +274,8 @@ namespace ImageCompare_Maikaze_
         private void MergeImage()
         {
             Buffer.BlockCopy(try_ori_px, 0, dpBmp[ImageTry].px, 0, try_ori_px.Length);
-            int cutImg_w = dpBmp[ImageDiff].w - Math.Abs(try_x);
-            int cutImg_h = dpBmp[ImageDiff].h - Math.Abs(try_y);
+            int cutImg_w = dpBmp[ImageDiff].w - Math.Abs(GetZeroWhenPosi(try_x)) - Math.Abs(GetZeroWhenPosi(dpBmp[ImageTry].w - dpBmp[ImageDiff].w - try_x));
+            int cutImg_h = dpBmp[ImageDiff].h - Math.Abs(GetZeroWhenPosi(try_y)) - Math.Abs(GetZeroWhenPosi(dpBmp[ImageTry].h - dpBmp[ImageDiff].h - try_y));
             cutImg = new MaikazeImage(cutImg_w, cutImg_h, 32);
             CreateCutImage();
             dpBmp[ImageTry].MergeImage(cutImg, try_x, try_y);
@@ -359,15 +366,16 @@ namespace ImageCompare_Maikaze_
             try_y += try_unit;
             MergeImage();
         }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            dpBmp.Clear();
+            InitValue();
+            InitUI();
+        }
+        private int GetZeroWhenPosi(int num)
+        {
+            if (num < 0)                return num;
+            else                        return 0;
+        }
     }
 }
-
-/*
-        private System.Windows.Visibility convVisable(bool willshow)
-        {
-            if (willshow)
-                return System.Windows.Visibility.Visible;
-            else
-                return System.Windows.Visibility.Hidden;
-        }
-*/

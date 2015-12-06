@@ -93,8 +93,8 @@ namespace ImageCompare_Maikaze_
             int start_y = merge_y;
             if (merge_x < 0)    start_x = 0;
             if (merge_y < 0)    start_y = 0;
-            for (int i = start_y; i < mergeBmp.h; i++)
-                for (int j = start_x; j < mergeBmp.w; j++)
+            for (int i = start_y; i < mergeBmp.h + start_y; i++)
+                for (int j = start_x; j < mergeBmp.w + start_x; j++)
                 {
                     if (ref_bpp == 4 && mergeBmp.px[((i - start_y) * mergeBmp.w + j - start_x) * ref_bpp + 3] == 0)
                         continue;
